@@ -1,0 +1,42 @@
+# -*- coding: utf-8 -*-
+import os
+import sys
+
+CWD = os.path.dirname(os.path.realpath(__file__))
+ROOT_DIR = os.path.dirname(CWD)
+sys.path.append(ROOT_DIR)
+
+from zk import ZK, const
+import zk
+# print (zk.__file__)
+i = None
+e = True
+conn = None
+zk = ZK('172.18.15.190', port=4370, verbose=True)
+conng = zk.connect()
+users = conng.get_users()
+for user in users:
+    print ('+ UID #{}'.format(user.uid))
+    i = user.uid+1
+conng.disconnect()
+while e:
+    print('uid is ',i)
+    user_id = input("Enter_User_ID : ")
+    name = input("Enter_Name : ")
+    password = input("Enter_Password : ")
+    try:
+        conn = zk.connect()
+        conn.set_user(uid=i, name=name, privilege=const.USER_DEFAULT, password=password, user_id=user_id)
+        i = i+1
+    except Exception as e:
+        print ("Process terminate : {}".format(e))
+    finally:
+        e = input("Press E To Exit Or Enter To Contiues")
+        if (e == 'e'):
+            e = False
+        else:
+            e=True
+
+        if not e:
+            if conn:
+                conn.disconnect()
